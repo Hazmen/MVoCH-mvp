@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP</title>
+    <script src="main.js" defer></script>
+    <!-- <script src="graphic.js"></script> -->
+    <link rel="stylesheet" href="main.css">
+    <!-- <script type="module" src="graphic.js"></script> -->
+
+</head>
+<body>
+    <div class="inputs">
+        <div class="inputss">
+            <input type="text" placeholder="number" class="input" inputmode="numeric" pattern="/d*">
+            <button class="btn">Начать</button>
+        </div>
+
+        <div class="controls">
+            <!-- <button class="control 1x">1x</button>
+            <button class="control 2x">2x</button>
+            <button class="control 3x">3x</button>
+            <button class="control 4x">4x</button> -->
+
+            <label for="speedRange">Скорость шагов:</label>
+            <input type="range" name="speed" id="speed" min="1" max="5" step="1" value="1">
+            <span id="speedValue">1х</span>
+        </div>
+    </div> 
+
+    <!-- <div id="sim-graph">
+
+    </div> -->
+
+    <div class="sim-text">
+        <div class="steeps">
+            <div class="steps">
+                
+            </div>
+            <button class="copy">Копировать</button>
+        </div>
+
+        <div class="statsss">
+            <div class="currentNum">
+                <div class="title">Current number:</div>
+                <div class="currentNumDig">None</div>
+                <div class="space"></div>
+            </div>
+            
+            <div class="stats">
+                <h2>Статистика</h2>
+                <p class="steps-count">количество шагов: </p>
+                <p class="max-stat">самое большое число:</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

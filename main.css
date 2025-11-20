@@ -1,0 +1,148 @@
+.input{
+    border: 1px solid black; 
+    appearance: none; 
+    border-radius: 10px; 
+    padding: 5px;
+    width: 100%;
+    max-width: 250px;
+}
+
+.inputs{
+    margin-bottom: 30px;
+}
+
+.steps{
+    border: 1px solid black;
+    width: 300px;
+    max-height: 400px;
+    height: 100vh;
+    margin-top: 20px;
+    background-color:rgb(255, 248, 147);
+    text-align: left;
+    padding: 3px;
+    overflow-y: auto;
+    margin-left: -10px;
+}
+
+*{
+    margin-left: 5px;
+}
+
+.btn{
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 5px 5px 5px 5px;
+    height: 30px;
+    margin-top: 5px;
+    width: 262px;
+}
+
+.btn:active{
+    transform: scale(1.1)
+}
+
+.steps p{
+    margin-top: 3px;
+}
+
+.stats{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: -10px;
+    /* padding: 0; */
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: rgb(235, 234, 234);
+    width: 225px;
+    height: 100%;
+    max-height: 225px;
+    overflow: auto;
+    aspect-ratio: 1/1;
+    /* margin-top: 147px; */
+    /* margin-left: -20px; */
+    line-break: anywhere;
+    border: 1px solid black;
+}
+
+.steps-count, .max-stat{
+    margin: 0;
+    margin-left: 5px;
+}
+
+.sim-text{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+}
+
+.controls{
+    margin-top: 5px;
+    /* margin-bottom: -15px; */
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-family: Arial;
+}
+
+.currentNum{
+    /* position: relative;
+    padding: 0px 0px 10px 0px;
+    background:rgb(255, 248, 147);
+    /* aspect-ratio: 1/1; */
+    /* display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;  */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -10px;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: rgb(249, 252, 171);
+    border: 1px solid black;
+    width: 225px;
+    max-height: 225px;
+    height: 100vh;
+    aspect-ratio: 1/1;
+    /* margin-top: 147px; */
+    /* margin-left: -20px; */
+    line-break: anywhere;
+    overflow: auto;
+}
+
+.currentNumDig{
+    font-size: 2.6rem;
+}
+
+.currentNumBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#sim-graph{
+    border: 1px solid black;
+    margin: 50px 0 20px 15px;
+    width: 500px;
+    height: 350px;
+}
+
+@media (max-width: 500px) {
+    .sim-text{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .statsss{
+        margin-left: 0px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+}
