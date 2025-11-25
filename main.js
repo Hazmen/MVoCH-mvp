@@ -14,7 +14,6 @@ let stepSpeed = 750;
 let isRunning = false;
 let currentTimeout = null;
 
-// globalization of list "spisok" for other files like "graphic.js" that doesnt exist now
 window.CollatzApp = {
     lastList: [],
     onNewList: null,
@@ -58,7 +57,7 @@ function speedRangeGetValue(){
     })
 }
 
-// A method with a recursive TimeOut
+// Способ с рекурсивным TimeOut
 function playSteps(list, i = 0) {
     if (i >= list.length) {
         isRunning = false;
@@ -73,18 +72,18 @@ function playSteps(list, i = 0) {
     steps.appendChild(p);
     steps.scrollTo({ top: steps.scrollHeight });
 
-    // We only work with the steps already shown
+    // Работаем только с уже показанными шагами
     const shown = list.slice(0, i + 1);
 
-    // Number of steps (numbers only)
+    // Количество шагов (только числа)
     const stepsCount = shown.filter(x => typeof x === 'number' || typeof x === 'bigint').length;
-    counter.textContent = `number of steps: ${stepsCount}`;
+    counter.textContent = `количество шагов: ${stepsCount}`;
 
-    // The maximum among the numbers shown
+    // Максимум среди показанных чисел
     const max = maxOfList(shown);
-    maxstat.textContent = `the largest number: ${max === null ? '-' : String(max)}`;
+    maxstat.textContent = `самое большое число: ${max === null ? '-' : String(max)}`;
 
-    // The current number for the indicator
+    // Текущее число для индикатора
     currentNum.textContent = (typeof value === 'number' || typeof value === 'bigint') ? String(value) : '1';
 
     currentTimeout = setTimeout(() => {
@@ -100,7 +99,7 @@ function IntOrBigInt(inputValue) {
     const s = inputValue.trim();
 
     if (!/^[0-9]+$/.test(s)) {
-        return { error: "Enter a positive number."};
+        return { error: "Введите положительное число."};
     }
 
     const normalized = s.split('.')[0]
@@ -131,7 +130,7 @@ copyBtn.addEventListener('click', () => {
 
     navigator.clipboard.writeText(textToCopy)
         .then(() => {
-            changeForASec(copyBtn, 'Copied!', 500)
+            changeForASec(copyBtn, 'Скопировано!', 500)
         })
         .catch(err => {
             changeForASec(copyBtn, `Error: ${err}`, 500)
@@ -169,7 +168,7 @@ btn.addEventListener('click', function(){
     playSteps(spisok);
 
     
-    // A way to perform a calculation in moment
+    // Способ выполнения вычисления за раз
     // steps.innerHTML = spisok
     // // .slice(0, spisok.length - 1)
     // .map((x, i) => { 
@@ -182,7 +181,7 @@ btn.addEventListener('click', function(){
 
 // ===========================================
 
-    // Step-by-step calculation method
+    // Способ вычисления пошагово
     // let i = 0;
     // const interval = setInterval(() => {
     //     if (i >= spisok.length) {
@@ -216,47 +215,46 @@ btn.addEventListener('click', function(){
 //     playSteps(list);
 // });
 
-// collatz() and collatz2 are old versions of calculations
-// function collatz(n){
-//     while (n !== 1){
-//         if (n % 2 === 0) {
-//             n = n / 2
-//             steps.textContent = n
-//         } else {
-//             n = n * 3 + 1
-//             steps.textContent = n
-//         }
-//     }
-// }
 
+function collatz(n){
+    while (n !== 1){
+        if (n % 2 === 0) {
+            n = n / 2
+            steps.textContent = n
+        } else {
+            n = n * 3 + 1
+            steps.textContent = n
+        }
+    }
+}
 
-// function collatz2(n){
-//     const spisok = [n];
-//     if (n <= 0) { 
-//         steps.textContent = "Enter a positive number" 
-//         counter.textContent = '';
-//         maxstat = '';
-//         return [];
-//     }
+function collatz2(n){
+    const spisok = [n];
+    if (n <= 0) { 
+        steps.textContent = "Введи положительное число" 
+        counter.textContent = '';
+        maxstat = '';
+        return [];
+    }
 
     
-//     while (n !== 1) { 
-//         n = (n % 2 === 0)? n / 2 : 3*n+1;
-//         spisok.push(n) // adds n to the listt
-//         if (spisok.length > 10000) {
-//             spisok.push("Too much, the site has a seizure")
-//         }
+    while (n !== 1) { 
+        n = (n % 2 === 0)? n / 2 : 3*n+1;
+        spisok.push(n) // добавляет n в списокк
+        if (spisok.length > 10000) {
+            spisok.push("Много шагов, у сайта приступ")
+        }
 
-//         if (n == 1) {
-//             spisok.push("You have reached an endless cycle!")
-//         }
-//     }
+        if (n == 1) {
+            spisok.push("Ты достиг бесконечного цикла!")
+        }
+    }
 
-    // counter.innerHTML = `number of steps: \n ${spisok.length - 1}`
+    // counter.innerHTML = `количество шагов: \n ${spisok.length - 1}`
 
     // const numsOnly = spisok.filter(x => typeof x === "number");
-    // const max = Math.max(...numsOnly) //... < decompresses the list into elements
-    // maxstat.innerHTML = `the largest number: \n ${max}`
+    // const max = Math.max(...numsOnly) //... < распаковывает список в элементы
+    // maxstat.innerHTML = `самое большое число: \n ${max}`
  
     return spisok;
 }
@@ -278,19 +276,17 @@ function collatzSmart(n, isBig) {
         spisok.push(n);
 
         if (spisok.length > 16000) {
-            spisok.push("It's a great number, but the steps are giving the site a fit!");
+            spisok.push('Отличное число, но шаги вызывают приступ у сайта!');
             break;
         }
     }
     
     if (n === ONE) {
-        spisok.push("The cycle has been reached.")
+        spisok.push("Цикл достигнут.")
     }
 
     return spisok;
 }
-
-
 
 
 
