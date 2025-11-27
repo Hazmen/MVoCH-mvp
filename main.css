@@ -118,7 +118,15 @@
 }
 
 .currentNumDig{
-    font-size: 2.6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6em;
+    line-height: 1em;
+    margin: 0 auto;
+    margin-top: -15px;
+    height: 150px;
+    text-align: center;
 }
 
 .currentNumBox{
