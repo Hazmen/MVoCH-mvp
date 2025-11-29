@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         steps.appendChild(p);
         steps.scrollTo({ top: steps.scrollHeight });
 
-        // Работаем только с уже показанными шагами
+        // Работаем только с уже показанных шагов
         const shown = list.slice(0, i + 1);
 
         // Количество шагов (только числа)
@@ -115,17 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
         maxstat.textContent = `самое большое число: ${max === null ? '-' : String(max)}`;
 
         // Текущее число для индикатора
-        // currentNum.textContent = (typeof value === 'number' || typeof value === 'bigint') ? String(value) : '1';
-
         currentNum.textContent = (typeof value === 'number' || typeof value === 'bigint')
                                  ? shortenNumForCND(value, 'e') : '1';
+
+        // Обновляем график с задержкой
+        setTimeout(() => {
+            updateGraph(shown);
+        }, 50); // Задержка 50 мс перед обновлением графика
 
         currentTimeout = setTimeout(() => {
             playSteps(list, i + 1);
         }, stepSpeed);
     }
-
-
 
     speedRangeGetValue();
 
@@ -156,11 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const spisok = collatzSmart(parsed.value, parsed.isBig);
 
-        // const text = steps.innerText;
         const numsOnly = spisok.filter(x => typeof x === "number" || typeof x === "bigint");
-        // new Text(numsOnly)
         const textToCopy = numsOnly.join('\n');
-
 
         navigator.clipboard.writeText(textToCopy)
             .then(() => {
@@ -180,14 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const parsed = IntOrBigInt(inp.value);
         console.log('parsed:', parsed, typeof parsed.value);
-        // const parsed = IntOrBigInt(inp.value);
         if (parsed.error) {
             steps.textContent = parsed.error;
             return;
         }
 
         const spisok = collatzSmart(parsed.value, parsed.isBig);
-
 
         window.CollatzApp.lastList = spisok;
 
@@ -200,101 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
             isRunning = false;
         }
 
-
         isRunning = true;
         playSteps(spisok);
-
-        
-        // Способ выполнения вычисления за раз
-        // steps.innerHTML = spisok
-        // // .slice(0, spisok.length - 1)
-        // .map((x, i) => { 
-        //     if (i === spisok.length - 1){
-        //         return `<p>${x}</p>`
-        // } else { 
-        //     return `<p>${i + 1}. ${x}</p>`
-        // }})
-        // .join('');
-
-    // ===========================================
-
-        // Способ вычисления пошагово
-        // let i = 0;
-        // const interval = setInterval(() => {
-        //     if (i >= spisok.length) {
-        //         clearInterval(interval);
-        //         return;
-        //     }
-
-        //     const value = spisok[i];
-        //     const p = document.createElement('p');
-        //     p.textContent = (typeof value === 'number')? `${i + 1}. ${value}`: value;
-        //     steps.appendChild(p);
-            
-        //     i++
-        // }, stepSpeed)
-        
-    // ==========================================
-
-        // const list = collatz2(Number(inp.value));
-
-        
     })
-
-
-    // btn.addEventListener('click', () => {
-    //     if (isRunning) return;
-
-    //     isRunning = true;
-    //     steps.textContent = "";
-    //     const list = collatz2(Number(inp.value));
-
-    //     playSteps(list);
-    // });
-
-
-    // function collatz(n){
-    //     while (n !== 1){
-    //         if (n % 2 === 0) {
-    //             n = n / 2
-    //             steps.textContent = n
-    //         } else {
-    //             n = n * 3 + 1
-    //             steps.textContent = n
-    //         }
-    //     }
-    // }
-
-    // function collatz2(n){
-    //     const spisok = [n];
-    //     if (n <= 0) { 
-    //         steps.textContent = "Введи положительное число" 
-    //         counter.textContent = '';
-    //         maxstat = '';
-    //         return [];
-    //     }
-
-        
-    //     while (n !== 1) { 
-    //         n = (n % 2 === 0)? n / 2 : 3*n+1;
-    //         spisok.push(n) // добавляет n в списокк
-    //         if (spisok.length > 10000) {
-    //             spisok.push("Много шагов, у сайта приступ")
-    //         }
-
-    //         if (n == 1) {
-    //             spisok.push("Ты достиг бесконечного цикла!")
-    //         }
-    //     }
-
-    //     // counter.innerHTML = `количество шагов: \n ${spisok.length - 1}`
-
-    //     // const numsOnly = spisok.filter(x => typeof x === "number");
-    //     // const max = Math.max(...numsOnly) //... < распаковывает список в элементы
-    //     // maxstat.innerHTML = `самое большое число: \n ${max}`
-    
-    //     return spisok;
-    // }
 
     function collatzSmart(n, isBig) {
         console.log('collatzSmart start, n:', n, typeof n, 'isBig:', isBig);
@@ -325,13 +229,216 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return spisok;
     }
-})
 
+    // Графическая логика
+    let graphInstance = null;
 
+    function updateGraph(list) {
+        const spis = list.filter(x => typeof x === 'number' || typeof x === 'bigint');
+        const nums = spis.map(x => graphLogSize(x));
+
+        if (!graphInstance) {
+            graphInstance = echarts.init(document.getElementById('sim-graph'), 'dark');
+            graphInstance.showLoading();
+        }
+
+        var option = {
+            title: {
+                text: 'Linear chart'
+            },
+
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    const p = params[0];
+                    const step = p.dataIndex;
+                    const value = spis[step];
+
+                    if (value === undefined) {
+                        return `Step: ${step}`;
+                    }
+
+                    const isEven = (typeof value === 'bigint')
+                        ? (value % 2n === 0n)
+                        : (value % 2 === 0);
+
+                    const oper = isEven ? "/ 2" : "* 3 + 1";
+
+                    return `
+                        Step: ${step}<br>
+                        Value: ${toolTipShorten(value)}<br>
+                        Operation: ${oper}
+                    `;
+                }
+            },
+
+            toolbox: {
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+
+            dataZoom: [
+                {
+                    type: 'inside',
+                    start: 0,
+                    end: 100
+                },
+                {
+                    start: 0,
+                    end: 10
+                }
+            ],
+
+            xAxis: {
+                type: 'category',
+                name: 'Step',
+                boundaryGap: false,
+                data: spis.map((_, i) => i)
+            },
+
+            yAxis: {
+                type: 'value',
+                name: 'Value',
+                axisLabel: {
+                    formatter: function(v) {
+                        if (!Array.isArray(spis) || spis.length === 0) return yAxisValueShorten(v);
+
+                        let nearestIdx = 0;
+                        let minDiff = Infinity;
+                        for (let i = 0; i < nums.length; i++) {
+                            const d = Math.abs(nums[i] - v);
+                            if (d < minDiff) { minDiff = d; nearestIdx = i; }
+                        }
+
+                        const orig = spis[nearestIdx];
+                        return formatOriginalForAxis(orig);
+                    }
+                }
+            },
+
+            series: [{
+                type: 'line',
+                data: nums,
+                showSymbol: true,
+                symbol: 'circle',
+                symbolSize: 6
+            }]
+        }
+
+        graphInstance.setOption(option, true); // notMerge = true
+        graphInstance.hideLoading();
+    }
+
+    // Функция для инициализации графика (не используется в динамике, но можно вызвать при старте)
+    window.CollatzApp.onNewList = function(list) {
+        console.log("Список получен! Победа!");
+        // Не вызываем drawGraph, т.к. обновления теперь через updateGraph
+    };
+});
+
+function shorten(numStr) {
+    if (numStr.length <= 12) return numStr;
+    return numStr.slice(0, 6) + "..." + numStr.slice(-4);
+}
+
+function normalize(value) {
+    if (typeof value === 'number') {
+        return value;
+    }
+
+    const str = value.toString();
+    const len = str.length;
+
+    if (value <= BigInt(Number.MAX_SAFE_INTEGER)) {
+        return Number(value);
+    }
+
+    return Math.log10(len);
+}
+
+function toolTipShorten(value) {
+    const s = value.toString();
+
+    if (s.length <= 15) {
+        return s;
+    }
+
+    return s.slice(0, 6) + "..." + s.slice(-6);
+}
+
+function graphLogSize(value) {
+    if (typeof value === 'number') {
+        if (!isFinite(value)) return NaN;
+        return Math.log10(Math.max(1, value));
+    }
+
+    const s = value.toString();
+    const k = 15
+    const leadStr = s.slice(0, k);
+    const leadNum = Number(leadStr);
+    const len = s.length;
+
+    const approxLog10 = Math.log10(leadNum) + (len - k);
+
+    return approxLog10; 
+}
+
+function yAxisValueShorten(value) {
+    if (typeof value !== 'number' || !isFinite(value)) return '';
+
+    let exp = Math.floor(value);
+    const frac = value - exp;
+
+    if (exp >= -3 && exp <= 6) {
+        const real = Math.round(Math.pow(10, value));
+        return String(real);
+    }
+
+    let mantissa = Math.pow(10, frac);
+    let mantissaRounded = Number(mantissa.toFixed(2));
+    if (mantissaRounded >= 10) {
+        mantissaRounded = Number((mantissaRounded / 10).toFixed(2));
+        exp += 1;
+    }
+
+    let mantissaStr = mantissaRounded % 1 === 0 ? String(mantissaRounded) : String(mantissaRounded).replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
+
+    const sign = exp >= 0 ? '+' : '';
+    return `${mantissaStr}e${sign}${exp}`;
+}
+
+function formatOriginalForAxis(value, sigDigits = 2) {
+    if (value === undefined) return '';
+
+    if (typeof value === 'number') {
+        if (!isFinite(value)) return '';
+        if (Math.abs(value) <= 1e6) return String(Math.round(value));
+        const parts = value.toExponential(sigDigits - 1).split('e');
+        const mant = parts[0].replace(/\.0+$/, '');
+        const exp = Number(parts[1]);
+        const sign = exp >= 0 ? '+' : '';
+        return `${mant}e${sign}${exp}`;
+    }
+
+    const s = value.toString();
+    if (s.length <= 3) return s;
+
+    const exp = s.length - 1;
+    const lead = s.slice(0, sigDigits);
+    let mantissa = Number(lead) / Math.pow(10, sigDigits - 1);
+
+    let mantRounded = Number(mantissa.toFixed(2));
+    if (mantRounded >= 10) { mantRounded = Number((mantRounded / 10).toFixed(2)); }
+
+    const mantStr = mantRounded % 1 === 0 ? String(mantRounded) : String(mantRounded).replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
+    const sign = exp >= 0 ? '+' : '';
+    return `${mantStr}e${sign}${exp}`;
+}
 
 console.log("speed =", document.getElementById("speed"));
 console.log("sim-graph =", document.getElementById("sim-graph"));
-
-
-
-
