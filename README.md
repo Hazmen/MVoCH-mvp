@@ -14,9 +14,10 @@ What the MVP can do at the time of writing the README (November 22, 2025):
 - Two blocks for displaying information:
 - Current number, which outputs the last number that appeared
 - Statistical, which displays in real time the number of steps and the largest number obtained during the calculation
+- A graph that outputs data exactly at the same speed as sim-text, with the possibility of zooming
 
 What is the future purpose of this project?:
--The opportunity to visually and interactively show how the Collatz hypothesis works, what it consists of, and show "All its beauty", including its history since its inception, its place in the mathematical community.
+- The opportunity to visually and interactively show how the Collatz hypothesis works, what it consists of, and show "All its beauty", including its history since its inception, its place in the mathematical community.
 - A material for professors and teachers of mathematics that allows students to learn in detail and visually about this hypothesis, largely due to its simplicity.
 
 What am I (we, if there are new members in the team) going to implement in the project in the future:
