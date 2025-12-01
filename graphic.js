@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-        window.CollatzApp.onNewList = function(list) {
-        console.log("Список получен! Победа!");
+    window.CollatzApp.onNewList = function(list) {
+        console.log("List received! Victory!");
 
         const spis = list.filter(x => typeof x === 'number' || typeof x === 'bigint');
         
@@ -18,13 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 text: 'Linear chart'
             },
 
-            // Добавим безопасный tooltip — проверяем наличие оригинальных данных
+            // Add a safe tooltip — check for original data availability
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
-                    const p = params[0];                 // берём первый элемент массива
-                    const step = p.dataIndex;            // индекс точки
-                    const value = spis[step];            // оригинальное число
+                    const p = params[0];                 // take the first item in the array
+                    const step = p.dataIndex;            // step index
+                    const value = spis[step];            // original number
 
                     if (value === undefined) {
                         return `Step: ${step}`;
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             ],
 
-            // Добавим X-ось чтобы ECharts корректно создавал cartesian координаты
+            // Add X-axis so ECharts correctly creates cartesian coordinates
             xAxis: {
                 type: 'category',
                 name: 'Step',
@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: 'Value',
                 axisLabel: {
                     formatter: function(v) {
-                        // v — это значение log10(original)
-                        // Найдём ближайший по масштабу реальный элемент из spis
+                        // v — this is the log10(original) value
+                        // Find the nearest real element from `spis` by scale
                         if (!Array.isArray(spis) || spis.length === 0) return yAxisValueShorten(v);
 
                         let nearestIdx = 0;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             series: [{
                 type: 'line',
 
-                // `nums` уже — логарифмические значения (graphLogSize). Не применять graphLogSize второй раз.
+                // `nums` already contains logarithmic values (from graphLogSize). Do NOT apply graphLogSize again.
                 data: nums,
 
                 showSymbol: true,
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ch1.setOption(option);
         ch1.hideLoading();
     }
-})
+});
 
 function shorten(numStr) {
     if (numStr.length <= 12) return numStr;
@@ -146,12 +146,12 @@ function toolTipShorten(value) {
 function graphLogSize(value) {
     if (typeof value === 'number') {
         if (!isFinite(value)) return NaN;
-        // для маленьких чисел в графике тоже возвращаем log10(value) чтобы всё было в одной шкале
+        // For small numbers, also return log10(value) to keep everything on the same scale
         return Math.log10(Math.max(1, value));
     }
 
     const s = value.toString();
-    const k = 15
+    const k = 15;
     const leadStr = s.slice(0, k);
     const leadNum = Number(leadStr);
     const len = s.length;
@@ -164,43 +164,43 @@ function graphLogSize(value) {
 function yAxisValueShorten(value) {
     if (typeof value !== 'number' || !isFinite(value)) return '';
 
-    // value — это log10(originalValue) (либо приближение)
+    // `value` is log10(originalValue) (or an approximation)
     let exp = Math.floor(value);
     const frac = value - exp;
 
-    // Маленькие числа — отображать как реальные целые (до 1e6)
+    // For small numbers — display as actual integers (up to 1e6)
     if (exp >= -3 && exp <= 6) {
         const real = Math.round(Math.pow(10, value));
         return String(real);
     }
 
-    // Для больших/малых чисел формируем научную нотацию: mantissa * 10^exp
+    // For large/small numbers, use scientific notation: mantissa * 10^exp
     let mantissa = Math.pow(10, frac);
 
-    // Округлим мантиссу до 2 значимых цифр (убираем лишние нули)
+    // Round mantissa to 2 significant digits (remove trailing zeros)
     let mantissaRounded = Number(mantissa.toFixed(2));
     if (mantissaRounded >= 10) {
-        // например, округление может дать 10.0 => сдвинем экспоненту
+        // e.g., rounding yields 10.0 → shift exponent
         mantissaRounded = Number((mantissaRounded / 10).toFixed(2));
         exp += 1;
     }
 
-    // Убираем лишние нули в дробной части
+    // Remove unnecessary trailing zeros in fractional part
     let mantissaStr = mantissaRounded % 1 === 0 ? String(mantissaRounded) : String(mantissaRounded).replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
 
     const sign = exp >= 0 ? '+' : '';
     return `${mantissaStr}e${sign}${exp}`;
 }
 
-// Форматирует оригинальное число (Number или BigInt) в компактную читаемую метку для оси Y
+// Formats the original number (Number or BigInt) into a compact, readable label for the Y-axis
 function formatOriginalForAxis(value, sigDigits = 2) {
     if (value === undefined) return '';
 
-    // Для обычных чисел — выводим целиком, если небольшой, иначе в экспоненциальной форме
+    // For regular numbers — show as-is if small, otherwise use exponential notation
     if (typeof value === 'number') {
         if (!isFinite(value)) return '';
         if (Math.abs(value) <= 1e6) return String(Math.round(value));
-        // большие числа — экспоненциальная запись
+        // Large numbers — exponential format
         const parts = value.toExponential(sigDigits - 1).split('e');
         const mant = parts[0].replace(/\.0+$/, '');
         const exp = Number(parts[1]);
@@ -208,16 +208,16 @@ function formatOriginalForAxis(value, sigDigits = 2) {
         return `${mant}e${sign}${exp}`;
     }
 
-    // Для BigInt — строим научную нотацию по строке
+    // For BigInt — build scientific notation from string
     const s = value.toString();
-    if (s.length <= 7) return s; // достаточно коротко
+    if (s.length <= 7) return s; // short enough
 
     const exp = s.length - 1;
-    // берём sigDigits значимых цифр
+    // Take `sigDigits` significant digits
     const lead = s.slice(0, sigDigits);
     let mantissa = Number(lead) / Math.pow(10, sigDigits - 1);
 
-    // округлим mantissa до 2 знаков после запятой при необходимости
+    // Round mantissa to 2 decimal places if needed
     let mantRounded = Number(mantissa.toFixed(2));
     if (mantRounded >= 10) { mantRounded = Number((mantRounded / 10).toFixed(2)); }
 
