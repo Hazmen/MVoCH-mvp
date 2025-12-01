@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    // Способ с рекурсивным TimeOut
+    // Recursive timeout-based playback
     function playSteps(list, i = 0) {
         if (i >= list.length) {
             isRunning = false;
@@ -103,25 +103,25 @@ document.addEventListener('DOMContentLoaded', () => {
         steps.appendChild(p);
         steps.scrollTo({ top: steps.scrollHeight });
 
-        // Работаем только с уже показанных шагов
+        // Work only with already displayed steps
         const shown = list.slice(0, i + 1);
 
-        // Количество шагов (только числа)
+        // Step count (numbers only)
         const stepsCount = shown.filter(x => typeof x === 'number' || typeof x === 'bigint').length;
-        counter.textContent = `количество шагов: ${stepsCount}`;
+        counter.textContent = `Number of steps: ${stepsCount}`;
 
-        // Максимум среди показанных чисел
+        // Maximum among displayed numbers
         const max = maxOfList(shown);
-        maxstat.textContent = `самое большое число: ${max === null ? '-' : String(max)}`;
+        maxstat.textContent = `Highest number: ${max === null ? '-' : String(max)}`;
 
-        // Текущее число для индикатора
+        // Current number for indicator
         currentNum.textContent = (typeof value === 'number' || typeof value === 'bigint')
                                  ? shortenNumForCND(value, 'e') : '1';
 
-        // Обновляем график с задержкой
+        // Update graph with delay
         setTimeout(() => {
             updateGraph(shown);
-        }, 50); // Задержка 50 мс перед обновлением графика
+        }, 50); // 50ms delay before graph update
 
         currentTimeout = setTimeout(() => {
             playSteps(list, i + 1);
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = inputValue.trim();
 
         if (!/^[0-9]+$/.test(s)) {
-            return { error: "Введите положительное число."};
+            return { error: "Please enter a positive integer." };
         }
 
         const normalized = s.split('.')[0]
@@ -147,9 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function changeForASec(item, changetxt, time){
-        old = item.textContent
-        item.textContent = changetxt
-        setTimeout(() => {item.innerHTML = old;}, time)
+        const old = item.textContent;
+        item.textContent = changetxt;
+        setTimeout(() => { item.textContent = old; }, time);
     }
 
     copyBtn.addEventListener('click', () => {
@@ -162,12 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         navigator.clipboard.writeText(textToCopy)
             .then(() => {
-                changeForASec(copyBtn, 'Скопировано!', 500)
+                changeForASec(copyBtn, 'Copied!', 500);
             })
             .catch(err => {
-                changeForASec(copyBtn, `Error: ${err}`, 500)
-            })
-    })
+                changeForASec(copyBtn, `Error: ${err}`, 500);
+            });
+    });
 
     function isEven(number){
         return number % 2 === 0;
@@ -198,39 +198,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isRunning = true;
         playSteps(spisok);
-    })
+    });
 
     function collatzSmart(n, isBig) {
         console.log('collatzSmart start, n:', n, typeof n, 'isBig:', isBig);
         const spisok = [n];
 
         const ONE = isBig ? 1n : 1;
-        const TWO = isBig? 2n : 2;
-        const THREE = isBig? 3n : 3;
+        const TWO = isBig ? 2n : 2;
+        const THREE = isBig ? 3n : 3;
 
         while (n !== ONE) {
             if (n % TWO === (isBig ? 0n : 0)) {
                 n = n / TWO;
             } else {
-                n = n * THREE + ONE
+                n = n * THREE + ONE;
             }
 
             spisok.push(n);
 
             if (spisok.length > 16000) {
-                spisok.push('Отличное число, но шаги вызывают приступ у сайта!');
+                spisok.push('Great number, but the steps are crashing the site!');
                 break;
             }
         }
         
         if (n === ONE) {
-            spisok.push("Цикл достигнут.")
+            spisok.push("Cycle reached.");
         }
 
         return spisok;
     }
 
-    // Графическая логика
+    // Graph logic
     let graphInstance = null;
 
     function updateGraph(list) {
@@ -334,10 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
         graphInstance.hideLoading();
     }
 
-    // Функция для инициализации графика (не используется в динамике, но можно вызвать при старте)
+    // Graph initialization callback (not used for dynamic updates, but kept for consistency)
     window.CollatzApp.onNewList = function(list) {
-        console.log("Список получен! Победа!");
-        // Не вызываем drawGraph, т.к. обновления теперь через updateGraph
+        console.log("List received! Victory!");
+        // Graph updates now handled via updateGraph
     };
 });
 
@@ -378,7 +378,7 @@ function graphLogSize(value) {
     }
 
     const s = value.toString();
-    const k = 15
+    const k = 15;
     const leadStr = s.slice(0, k);
     const leadNum = Number(leadStr);
     const len = s.length;
